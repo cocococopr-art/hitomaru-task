@@ -1116,10 +1116,8 @@ async function pullGs(){
   const j=await gsGet({action:'getAll'});
   if(j.ok&&j.tasks){
     j.tasks.forEach(rt=>{
-      // GASから来たdeadlineは日付文字列 or 空文字
-      const dl = rt.deadline || rt.date || '';
-      // 'YYYY-MM-DD'形式でないものは捨てる
-      const safeDeadline = /^\d{4}-\d{2}-\d{2}$/.test(dl) ? dl : '';
+      // GASが YYYY-MM-DD に変換済みで返す
+      const safeDeadline = rt.deadline || '';
 
       let found=false;
       Object.keys(D).forEach(dk=>{
@@ -1206,14 +1204,28 @@ const GAS_CODE=[
   "  // getAll",
   "  var all=sheet.getDataRange().getValues();",
   "  var tasks=all.slice(1).map(function(r){",
-  "    // 〆切日はスプレッドシートでDate型になる場合があるため文字列変換",
+  "    // 〆切日：Date型・文字列どちらでも YYYY-MM-DD に変換",
   "    var dl='';",
   "    if(r[6]){",
-  "      if(r[6] instanceof Date){",
-  "        var dd=r[6];",
-  "        dl=dd.getFullYear()+'-'+('0'+(dd.getMonth()+1)).slice(-2)+'-'+('0'+dd.getDate()).slice(-2);",
+  "      var raw=r[6];",
+  "      if(Object.prototype.toString.call(raw)=='[object Date]'){",
+  "        dl=raw.getFullYear()+'-'+('0'+(raw.getMonth()+1)).slice(-2)+'-'+('0'+raw.getDate()).slice(-2);",
   "      } else {",
-  "        dl=String(r[6]);",
+  "        var s=String(raw).trim();",
+  "        // すでに YYYY-MM-DD 形式",
+  "        if(/^\\d{4}-\\d{2}-\\d{2}$/.test(s)){ dl=s; }",
+  "        // スラッシュ区切り YYYY/MM/DD",
+  "        else if(/^\\d{4}\\/\\d{1,2}\\/\\d{1,2}$/.test(s)){",
+  "          var p=s.split('/');",
+  "          dl=p[0]+'-'+('0'+p[1]).slice(-2)+'-'+('0'+p[2]).slice(-2);",
+  "        }",
+  "        // それ以外はDateオブジェクトとして解析を試みる",
+  "        else {",
+  "          var td=new Date(s);",
+  "          if(!isNaN(td.getTime())){",
+  "            dl=td.getFullYear()+'-'+('0'+(td.getMonth()+1)).slice(-2)+'-'+('0'+td.getDate()).slice(-2);",
+  "          }",
+  "        }",
   "      }",
   "    }",
   "    return{",
