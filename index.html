@@ -54,10 +54,16 @@ body {
   flex: 1; display: flex; align-items: center; gap: 6px;
   background: var(--gbg); border: 1px solid var(--gln);
   border-radius: 100px; padding: 0 16px; height: 44px;
+  position: relative; overflow: hidden;
 }
-.dpill-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
-.dpill-txt { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 600; color: var(--gold); }
-input[type=date].hidden { position: absolute; opacity: 0; pointer-events: none; width: 0; height: 0; }
+.dpill-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); flex-shrink: 0; pointer-events: none; }
+.dpill-txt { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 600; color: var(--gold); pointer-events: none; flex: 1; }
+/* date inputをピルに重ねて透明に：iPhoneで直接タップ可能 */
+.dpill input[type=date] {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  opacity: 0; cursor: pointer;
+  font-size: 16px; border: none; background: none; padding: 0; margin: 0;
+}
 .cnt { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--ink3); white-space: nowrap; }
 .gsbtn {
   width: 44px; height: 44px; border: 1px solid var(--ln); background: var(--sf2);
@@ -279,11 +285,11 @@ textarea { min-height: 68px; resize: vertical; line-height: 1.6; }
 <header class="top">
   <div class="top-in">
     <button class="ibtn" onclick="openDrw()">☰</button>
-    <button class="dpill" onclick="openPicker()" style="border:none;">
+    <div class="dpill">
       <div class="dpill-dot"></div>
       <span class="dpill-txt" id="ddisp">読込中…</span>
-    </button>
-    <input type="date" id="dinput" class="hidden" onchange="onDate(this.value)">
+      <input type="date" id="dinput" onchange="onDate(this.value)">
+    </div>
     <span class="cnt" id="cnt">0件</span>
     <button class="gsbtn" onclick="openM('gmod')"><div class="dot" id="gdot"></div></button>
   </div>
@@ -496,10 +502,7 @@ function dispShort(s) {
   return Number(p[1])+'/'+Number(p[2]);
 }
 function showDate() { document.getElementById('ddisp').textContent = dispFull(date); }
-function openPicker() {
-  const el = document.getElementById('dinput');
-  try { el.showPicker(); } catch(e) { el.focus(); el.click(); }
-}
+// date input is now directly in the pill
 function onDate(v) {
   date = v || today();
   showDate(); renderPv(); renderCl(); refreshCnt();
