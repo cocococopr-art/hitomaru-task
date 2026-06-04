@@ -851,7 +851,9 @@ async function pullGs(){
         if(t){t.done=rt.done;t.nextRound=rt.nextRound;t.carryover=rt.carryover;t.memo=rt.memo;if(dl)t.deadline=dl;found=true;}
       });
       if(!found){
-        const dk=rt.addedDate||date;
+        // addedDateが正しいYYYY-MM-DD形式かチェック
+        const dk = (rt.addedDate && /^\d{4}-\d{2}-\d{2}$/.test(rt.addedDate))
+          ? rt.addedDate : date;
         if(!D[dk])D[dk]={tasks:[]};
         const bk=Object.entries(BIZ).find(([,v])=>v.lbl===rt.biz)?.[0]||'oth';
         D[dk].tasks.push({id:rt.id,assignee:rt.assignee,bizKey:bk,biz:rt.biz,content:rt.content,memo:rt.memo||'',priority:rt.priority,deadline:dl,done:rt.done,nextRound:rt.nextRound,carryover:rt.carryover,addedDate:dk});
@@ -922,7 +924,22 @@ const GC=[
   "        }",
   "      }",
   "    }",
-  "    return{id:r[0],assignee:r[1],biz:r[2],content:r[3],memo:r[4],priority:r[5],deadline:dl,done:r[7]===true||r[7]==='TRUE',nextRound:r[8]===true||r[8]==='TRUE',carryover:r[9]===true||r[9]==='TRUE',addedDate:r[11]?String(r[11]):''};",
+  "    // addedDate(r[11])もDate型に変わる場合があるのでYYYY-MM-DD変換",
+"    var ad='';",
+"    if(r[11]){",
+"      if(Object.prototype.toString.call(r[11])==='[object Date]'){",
+"        var dd2=r[11];",
+"        ad=dd2.getFullYear()+'-'+('0'+(dd2.getMonth()+1)).slice(-2)+'-'+('0'+dd2.getDate()).slice(-2);",
+"      } else {",
+"        var s2=String(r[11]).trim();",
+"        if(/^\\d{4}-\\d{2}-\\d{2}$/.test(s2)){ ad=s2; }",
+"        else if(/^\\d{4}\\/\\d{1,2}\\/\\d{1,2}$/.test(s2)){",
+"          var p2=s2.split('/');",
+"          ad=p2[0]+'-'+('0'+p2[1]).slice(-2)+'-'+('0'+p2[2]).slice(-2);",
+"        }",
+"      }",
+"    }",
+"    return{id:r[0],assignee:r[1],biz:r[2],content:r[3],memo:r[4],priority:r[5],deadline:dl,done:r[7]===true||r[7]==='TRUE',nextRound:r[8]===true||r[8]==='TRUE',carryover:r[9]===true||r[9]==='TRUE',addedDate:ad};",
   "  });",
   "  return R({ok:true,tasks:tasks});",
   "}",
