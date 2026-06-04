@@ -128,19 +128,26 @@ textarea { min-height: 68px; resize: vertical; line-height: 1.6; }
 .chip {
   padding: 0 16px; border: 1px solid var(--ln); border-radius: 100px;
   background: var(--bg); font-size: 13px; color: var(--ink2);
-  height: 44px; display: flex; align-items: center;
+  height: 44px; display: flex; align-items: center; cursor: pointer;
+  user-select: none; -webkit-user-select: none;
 }
 .chip.fx { flex: 1; justify-content: center; }
-.ch-ac { background: var(--gbg); border-color: var(--gold); color: var(--gold); font-weight: 500; }
-.ch-ag { background: var(--hbg); border-color: var(--hito); color: var(--hito); font-weight: 500; }
-.ch-bh { background: var(--hbg); border-color: var(--hito); color: var(--hito); font-weight: 500; }
-.ch-bz { background: var(--zbg); border-color: var(--zen);  color: var(--zen);  font-weight: 500; }
-.ch-ba { background: var(--abg); border-color: var(--ad);   color: var(--ad);   font-weight: 500; }
-.ch-bp { background: var(--pbg); border-color: var(--prv);  color: var(--prv);  font-weight: 500; }
-.ch-bo { background: var(--obg); border-color: var(--oth);  color: var(--oth);  font-weight: 500; }
-.ch-ph { background: #F9EAEA; border-color: #C97070; color: var(--red);  font-weight: 500; }
-.ch-pm { background: #FBF4E4; border-color: #C9A850; color: var(--orn);  font-weight: 500; }
-.ch-pl { background: #E8F4EE; border-color: #5CA87A; color: var(--grn);  font-weight: 500; }
+/* radio inputを非表示 */
+.chip input[type=radio] { position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none; }
+
+/* 担当 */
+#achips label:nth-child(1):has(input:checked) { background:var(--gbg); border-color:var(--gold); color:var(--gold); font-weight:500; }
+#achips label:nth-child(2):has(input:checked) { background:var(--hbg); border-color:var(--hito); color:var(--hito); font-weight:500; }
+/* 事業 */
+#bchips label:nth-child(1):has(input:checked) { background:var(--hbg); border-color:var(--hito); color:var(--hito); font-weight:500; }
+#bchips label:nth-child(2):has(input:checked) { background:var(--zbg); border-color:var(--zen);  color:var(--zen);  font-weight:500; }
+#bchips label:nth-child(3):has(input:checked) { background:var(--abg); border-color:var(--ad);   color:var(--ad);   font-weight:500; }
+#bchips label:nth-child(4):has(input:checked) { background:var(--pbg); border-color:var(--prv);  color:var(--prv);  font-weight:500; }
+#bchips label:nth-child(5):has(input:checked) { background:var(--obg); border-color:var(--oth);  color:var(--oth);  font-weight:500; }
+/* 重要度 */
+#pchips label:nth-child(1):has(input:checked) { background:#F9EAEA; border-color:#C97070; color:var(--red); font-weight:500; }
+#pchips label:nth-child(2):has(input:checked) { background:#FBF4E4; border-color:#C9A850; color:var(--orn); font-weight:500; }
+#pchips label:nth-child(3):has(input:checked) { background:#E8F4EE; border-color:#5CA87A; color:var(--grn); font-weight:500; }
 
 /* ── ADD BTN ── */
 .addbtn {
@@ -308,8 +315,8 @@ textarea { min-height: 68px; resize: vertical; line-height: 1.6; }
       <div class="fld">
         <span class="flbl">担当</span>
         <div class="chips" id="achips">
-          <button class="chip fx ch-ac" onclick="pickA(this,'ココ')">ココ</button>
-          <button class="chip fx"       onclick="pickA(this,'グッチ')">グッチ</button>
+          <label class="chip fx"><input type="radio" name="assign" value="ココ" checked onchange="document.getElementById('hA').value=this.value">ココ</label>
+          <label class="chip fx"><input type="radio" name="assign" value="グッチ"   onchange="document.getElementById('hA').value=this.value">グッチ</label>
         </div>
         <input type="hidden" id="hA" value="ココ">
       </div>
@@ -317,11 +324,11 @@ textarea { min-height: 68px; resize: vertical; line-height: 1.6; }
       <div class="fld">
         <span class="flbl">事業</span>
         <div class="chips" id="bchips">
-          <button class="chip ch-bh" onclick="pickB(this,'hito')" data-v="hito">ヒトマル</button>
-          <button class="chip"       onclick="pickB(this,'zen')" data-v="zen">善</button>
-          <button class="chip"       onclick="pickB(this,'ad')" data-v="ad">広告代理店</button>
-          <button class="chip"       onclick="pickB(this,'prv')" data-v="prv">プライベート</button>
-          <button class="chip"       onclick="pickB(this,'oth')" data-v="oth">その他</button>
+          <label class="chip"><input type="radio" name="biz" value="hito" checked onchange="onBiz(this.value)">ヒトマル</label>
+          <label class="chip"><input type="radio" name="biz" value="zen"        onchange="onBiz(this.value)">善</label>
+          <label class="chip"><input type="radio" name="biz" value="ad"         onchange="onBiz(this.value)">広告代理店</label>
+          <label class="chip"><input type="radio" name="biz" value="prv"        onchange="onBiz(this.value)">プライベート</label>
+          <label class="chip"><input type="radio" name="biz" value="oth"        onchange="onBiz(this.value)">その他</label>
         </div>
         <input type="hidden" id="hB" value="hito">
         <div class="otherwrap" id="owrap"><input type="text" id="othin" placeholder="事業名を入力…"></div>
@@ -340,9 +347,9 @@ textarea { min-height: 68px; resize: vertical; line-height: 1.6; }
       <div class="fld">
         <span class="flbl">重要度</span>
         <div class="chips" id="pchips">
-          <button class="chip fx"       onclick="pickP(this,'高')" data-v="高">高</button>
-          <button class="chip fx ch-pm" onclick="pickP(this,'中')" data-v="中">中</button>
-          <button class="chip fx"       onclick="pickP(this,'低')" data-v="低">低</button>
+          <label class="chip fx"><input type="radio" name="pri" value="高"   onchange="document.getElementById('hP').value=this.value">高</label>
+          <label class="chip fx"><input type="radio" name="pri" value="中" checked onchange="document.getElementById('hP').value=this.value">中</label>
+          <label class="chip fx"><input type="radio" name="pri" value="低"   onchange="document.getElementById('hP').value=this.value">低</label>
         </div>
         <input type="hidden" id="hP" value="中">
       </div>
@@ -518,27 +525,10 @@ function goPage(n, btn) {
 }
 
 // ── チップ ──
-function pickA(btn, v) {
-  document.getElementById('hA').value = v;
-  document.querySelectorAll('#achips .chip').forEach(b => {
-    const bv = b.textContent.trim();
-    b.className = 'chip fx' + (bv==='ココ'&&v==='ココ' ? ' ch-ac' : bv==='グッチ'&&v==='グッチ' ? ' ch-ag' : '');
-  });
-}
-function pickB(btn, v) {
+// radio方式なのでpick関数はonBizのみ
+function onBiz(v) {
   document.getElementById('hB').value = v;
-  document.querySelectorAll('#bchips .chip').forEach(b => {
-    // data-v属性で判定（thisの参照に頼らない）
-    b.className = 'chip' + (b.dataset.v===v ? ' ch-b'+v : '');
-  });
   document.getElementById('owrap').classList.toggle('on', v==='oth');
-}
-function pickP(btn, v) {
-  document.getElementById('hP').value = v;
-  const cls = {高:'ch-ph',中:'ch-pm',低:'ch-pl'};
-  document.querySelectorAll('#pchips .chip').forEach(b => {
-    b.className = 'chip fx' + (b.dataset.v===v ? ' '+cls[v] : '');
-  });
 }
 
 // ── タスク追加 ──
@@ -575,9 +565,7 @@ async function addTask() {
   document.getElementById('min').value = '';
   document.getElementById('dlin').value = '';
   // 重要度を中にリセット
-  document.querySelectorAll('#pchips .chip').forEach(b => {
-    b.className = 'chip fx' + (b.dataset.v==='中' ? ' ch-pm' : '');
-  });
+  document.querySelector('#pchips input[value="中"]').checked = true;
   document.getElementById('hP').value = '中';
   renderPv(); refreshCnt();
 }
