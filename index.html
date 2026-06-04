@@ -307,7 +307,7 @@ textarea { min-height: 68px; resize: vertical; line-height: 1.6; }
 
       <div class="fld">
         <span class="flbl">担当</span>
-        <div class="chips">
+        <div class="chips" id="achips">
           <button class="chip fx ch-ac" onclick="pickA(this,'ココ')">ココ</button>
           <button class="chip fx"       onclick="pickA(this,'グッチ')">グッチ</button>
         </div>
@@ -316,12 +316,12 @@ textarea { min-height: 68px; resize: vertical; line-height: 1.6; }
 
       <div class="fld">
         <span class="flbl">事業</span>
-        <div class="chips">
-          <button class="chip ch-bh" onclick="pickB(this,'hito')">ヒトマル</button>
-          <button class="chip"       onclick="pickB(this,'zen')">善</button>
-          <button class="chip"       onclick="pickB(this,'ad')">広告代理店</button>
-          <button class="chip"       onclick="pickB(this,'prv')">プライベート</button>
-          <button class="chip"       onclick="pickB(this,'oth')">その他</button>
+        <div class="chips" id="bchips">
+          <button class="chip ch-bh" onclick="pickB(this,'hito')" data-v="hito">ヒトマル</button>
+          <button class="chip"       onclick="pickB(this,'zen')" data-v="zen">善</button>
+          <button class="chip"       onclick="pickB(this,'ad')" data-v="ad">広告代理店</button>
+          <button class="chip"       onclick="pickB(this,'prv')" data-v="prv">プライベート</button>
+          <button class="chip"       onclick="pickB(this,'oth')" data-v="oth">その他</button>
         </div>
         <input type="hidden" id="hB" value="hito">
         <div class="otherwrap" id="owrap"><input type="text" id="othin" placeholder="事業名を入力…"></div>
@@ -339,10 +339,10 @@ textarea { min-height: 68px; resize: vertical; line-height: 1.6; }
 
       <div class="fld">
         <span class="flbl">重要度</span>
-        <div class="chips">
-          <button class="chip fx"       onclick="pickP(this,'高')">高</button>
-          <button class="chip fx ch-pm" onclick="pickP(this,'中')">中</button>
-          <button class="chip fx"       onclick="pickP(this,'低')">低</button>
+        <div class="chips" id="pchips">
+          <button class="chip fx"       onclick="pickP(this,'高')" data-v="高">高</button>
+          <button class="chip fx ch-pm" onclick="pickP(this,'中')" data-v="中">中</button>
+          <button class="chip fx"       onclick="pickP(this,'低')" data-v="低">低</button>
         </div>
         <input type="hidden" id="hP" value="中">
       </div>
@@ -520,23 +520,24 @@ function goPage(n, btn) {
 // ── チップ ──
 function pickA(btn, v) {
   document.getElementById('hA').value = v;
-  document.querySelectorAll('#pg1 .chips')[0].querySelectorAll('.chip').forEach(b => {
-    b.className = 'chip fx' + (b.textContent.trim()==='ココ'&&v==='ココ' ? ' ch-ac' : b.textContent.trim()==='グッチ'&&v==='グッチ' ? ' ch-ag' : '');
+  document.querySelectorAll('#achips .chip').forEach(b => {
+    const bv = b.textContent.trim();
+    b.className = 'chip fx' + (bv==='ココ'&&v==='ココ' ? ' ch-ac' : bv==='グッチ'&&v==='グッチ' ? ' ch-ag' : '');
   });
 }
 function pickB(btn, v) {
   document.getElementById('hB').value = v;
-  document.querySelectorAll('#pg1 .chips')[1].querySelectorAll('.chip').forEach(b => {
-    b.className = 'chip' + (b===btn ? ' ch-b'+v : '');
+  document.querySelectorAll('#bchips .chip').forEach(b => {
+    // data-v属性で判定（thisの参照に頼らない）
+    b.className = 'chip' + (b.dataset.v===v ? ' ch-b'+v : '');
   });
   document.getElementById('owrap').classList.toggle('on', v==='oth');
 }
 function pickP(btn, v) {
   document.getElementById('hP').value = v;
   const cls = {高:'ch-ph',中:'ch-pm',低:'ch-pl'};
-  document.querySelectorAll('#pg1 .chips')[2].querySelectorAll('.chip').forEach(b => {
-    const bv = b.textContent.trim();
-    b.className = 'chip fx' + (bv===v ? ' '+cls[v] : '');
+  document.querySelectorAll('#pchips .chip').forEach(b => {
+    b.className = 'chip fx' + (b.dataset.v===v ? ' '+cls[v] : '');
   });
 }
 
@@ -574,8 +575,8 @@ async function addTask() {
   document.getElementById('min').value = '';
   document.getElementById('dlin').value = '';
   // 重要度を中にリセット
-  document.querySelectorAll('#pg1 .chips')[2].querySelectorAll('.chip').forEach(b => {
-    b.className = 'chip fx' + (b.textContent.trim()==='中' ? ' ch-pm' : '');
+  document.querySelectorAll('#pchips .chip').forEach(b => {
+    b.className = 'chip fx' + (b.dataset.v==='中' ? ' ch-pm' : '');
   });
   document.getElementById('hP').value = '中';
   renderPv(); refreshCnt();
